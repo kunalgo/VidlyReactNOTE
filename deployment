@@ -20,16 +20,20 @@ https://moviesbook.herokuapp.com/
 
 https://git.heroku.com/moviesbook.git
 
+9>>
+  then just populate some genre value, by using postman
+
+
 10 >>
 
     take the all line
     and go to the heroku application and create an app and then go to the setting -> config vars ->
     set the key :
-    (vidly_db) -> value : "mongodb+srv://userk:12345@cluster0.ldpsf.mongodb.net/vidly9?retryWrites=true&w=majority"
+    (vidly_db) in this case ->  "mongodb+srv://userk:12345@cluster0.ldpsf.mongodb.net/vidly9?retryWrites=true&w=majority"
     {keep the entire lines}
     do this in UI levels, don't set the value in the cmd line, some time it create issue.
 
-    checking the spelling of each line of code.
+    checking the spelling of each line of code. if you are getting error.
 
 
 11 >>
