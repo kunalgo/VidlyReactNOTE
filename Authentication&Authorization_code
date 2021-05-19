@@ -1,0 +1,452 @@
+3__
+
+movieForm.jsx__
+
+import * as userService from "../services/userServices";
+
+doSubmit = async () => {
+  await userService.register(this.state.data);
+};
+
+userServices.jsx__
+
+import http from "./httpService";
+import { apiUrl } from "../config.json";
+
+const apiEndpoint = apiUrl + "/users";
+
+export function register(user) {
+  return http.post(apiEndpoint, {
+    email: user.username,
+    password: user.password,
+    name: user.name,
+  });
+}
+
+4__
+
+registerForm.js__
+
+doSubmit = async () => {
+    try {
+      await userService.register(this.state.data);
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        const errors = { ...this.state.errors };
+        errors.username = ex.response.data;
+        this.setState({ errors });
+      }
+    }
+  };
+
+6__ <registerForm.jsx>
+
+import { login } from "../services/authService";
+
+doSubmit = async () => {
+  const { data } = this.state;
+  await login(data.username, data.password);
+};
+
+7__ <registerForm.jsx>
+
+doSubmit = async () => {
+    try {
+      const { data } = this.state;
+      await login(data.username, data.password);
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        const errors = { ...this.state.errors };
+        errors.username = ex.response.data;
+        this.setState({ errors });
+      }
+    }
+  };
+
+
+8__ <registerForm.jsx>
+doSubmit = async () => {
+    try {
+      const { data } = this.state;
+      const { data: jwt } = await login(data.username, data.password);
+      localStorage.setItem("token", jwt);
+      this.props.history.push("/");
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        const errors = { ...this.state.errors };
+        errors.username = ex.response.data;
+        this.setState({ errors });
+      }
+    }
+  };
+
+9__
+
+<users.js>__
+.header("access-control-expose-headers","x-auth-token")
+
+<registerForm.jsx>
+
+doSubmit = async () => {
+    try {
+      const response = await userService.register(this.state.data);
+      localStorage.setItem("token", response.headers["x-auth-token"]);
+      this.props.history.push("/");
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        const errors = { ...this.state.errors };
+        errors.username = ex.response.data;
+        this.setState({ errors });
+      }
+    }
+  };
+
+11__
+
+import jwtDecode from "jwt-decode";
+
+app.js__
+
+class App extends Component {
+  state = {};
+
+  componentDidMount() {
+    try {
+      const jwt = localStorage.getItem("token");
+      const user = jwtDecode(jwt);
+      this.setState({ user });
+    } catch (ex) {}
+  }
+  render() {
+    return (
+      <div>
+        <ToastContainer />
+        <NavBar user={this.state.user} />
+
+
+12__
+navbar.jsx>>
+
+{!user && (
+            <React.Fragment>
+              <NavLink className="nav-item nav-link" to="/login">
+                Login
+              </NavLink>
+              <NavLink className="nav-item nav-link" to="/register">
+                Register
+              </NavLink>
+            </React.Fragment>
+          )}
+          {user && (
+            <React.Fragment>
+              <NavLink className="nav-item nav-link" to="/profile">
+                {user.name}
+              </NavLink>
+              <NavLink className="nav-item nav-link" to="/logout">
+                Logout
+              </NavLink>
+            </React.Fragment>
+          )}
+
+
+loginForm.jsx and registerform.jsx>>
+
+window.location = "/";
+
+13__
+
+logout.jsx>>>
+
+import React, { Component } from "react";
+class Logout extends Component {
+  componentDidMount() {
+    localStorage.removeItem("token");
+
+    window.location = "/";
+  }
+  render() {
+    return null;
+  }
+}
+export default Logout;
+
+<Route path="/logout" component={Logout}></Route>
+
+14__
+
+import http from "./httpService";
+import { apiUrl } from "../config.json";
+import jwtDecode from "jwt-decode";
+
+const apiEndpoint = apiUrl + "/auth";
+const tokenKey = "token";
+
+export async function login(email, password) {
+  const { data: jwt } = await http.post(apiEndpoint, { email, password });
+  localStorage.setItem(tokenKey, jwt);
+}
+
+export function logout() {
+  localStorage.removeItem(tokenKey);
+}
+
+export function loginWithJwt(jwt) {
+  localStorage.setItem(tokenKey, jwt);
+}
+
+export function getCurrentUser() {
+  try {
+    const jwt = localStorage.getItem(tokenKey);
+    return jwtDecode(jwt);
+  } catch (ex) {
+    return null;
+  }
+}
+
+export default {
+  login,
+  logout,
+  getCurrentUser,
+  loginWithJwt,
+};
+
+// change the loginForm.jsx, app.js, registerForm.jsx, logout.jsx
+
+15__
+
+authServices.js__
+
+export function getJwt() {
+  return localStorage.getItem(tokenKey);
+}
+
+httpServices.js__
+
+import auth from "./authService";
+axios.defaults.headers.common['x-auth-token'] = auth.getJwt();
+
+16__
+
+authServices.js__
+
+http.setJwt(getJwt());
+
+httpServices.js__
+
+function setJwt(jwt){
+  axios.defaults.headers.common["x-auth-token"]= jwt;
+}
+
+export default {
+  get: axios.get,
+  post: axios.post,
+  put: axios.put,
+  delete: axios.delete,
+  setJwt
+};
+
+
+18__
+
+app.js__
+
+<Route path="/movies"
+  render={props => <Movies {...props} user={this.state.user} /> } />
+
+Movie.js__
+
+{user && (
+    <Link
+      to="/movies/new"
+      className="btn btn-primary"
+      style={{ marginBottom: 20 }}
+    >
+      New Movie
+    </Link>
+)}
+
+19__
+app.js__
+
+<Route path="/movies/:id"
+       render = {props => {
+       if (!user) return <Redirect to="/login" />;
+       return <MovieForm {...props} />
+       }}
+     />
+
+20__
+
+ protectedRoute.js__
+
+ import React, { Component } from "react";
+import authService from "../services/authService";
+import { Route, Redirect } from "react-router-dom";
+
+const ProtectedRoute = ({ path, component: Component, render, ...rest }) => {
+  return (
+    <Route
+      {...rest}
+      render={(props) => {
+        if (!authService.getCurrentUser()) return <Redirect to="/login" />;
+        return Component ? <Component {...props} /> : render(props);
+      }}
+    />
+  );
+};
+
+export default ProtectedRoute;
+
+app.jsx__
+
+  <ProtectedRoute path="/movies/:id" component ={MovieForm}  />
+
+21>>
+ProtectedRoute.jsx__
+
+import React, { Component } from "react";
+import authService from "../services/authService";
+import { Route, Redirect } from "react-router-dom";
+
+const ProtectedRoute = ({ path, component: Component, render, ...rest }) => {
+  return (
+    <Route
+      {...rest}
+      render={(props) => {
+        if (!authService.getCurrentUser())
+          return (
+            <Redirect
+              to={{
+                pathname: "/login",
+                state: { from: props.location },
+              }}
+            />
+          );
+        return Component ? <Component {...props} /> : render(props);
+      }}
+    />
+  );
+};
+
+export default ProtectedRoute;
+
+
+loginForm.jsx__
+
+import React, { Component } from "react";
+import Input from "./common/input";
+import Joi from "joi-browser";
+import Form from "./common/form";
+import auth from "../services/authService";
+import { Redirect } from "react-router-dom";
+
+class LoginForm extends Form {
+  state = {
+    data: { username: "", password: "" },
+    errors: {},
+  };
+
+  schema = {
+    username: Joi.string().required().label("Username"),
+    password: Joi.string().required().label("Password"),
+  };
+
+  doSubmit = async () => {
+    try {
+      const { data } = this.state;
+      await auth.login(data.username, data.password);
+
+      const { state } = this.props.location;
+      window.location = state ? state.from.pathname : "/";
+    } catch (ex) {
+      if (ex.response && ex.response.status === 400) {
+        const errors = { ...this.state.errors };
+        errors.username = ex.response.data;
+        this.setState({ errors });
+      }
+    }
+  };
+
+  render() {
+    if (auth.getCurrentUser()) return <Redirect to="/" />;
+    return (
+      <div>
+        <h1>Login</h1>
+        <hr />
+        <form onSubmit={this.handleSubmit}>
+          {this.renderInput("username", "Username", true)}
+          {this.renderInput("password", "Password", false, "password")}
+          {this.renderButton("Login")}
+        </form>
+      </div>
+    );
+  }
+}
+
+export default LoginForm;
+
+
+23__
+
+import React, { Component } from "react";
+import auth from "../services/authService";
+import { Link } from "react-router-dom";
+import Like from "./common/like";
+import Table from "./common/table";
+
+class MoviesTable extends Component {
+  columns = [
+    {
+      path: "title",
+      label: "Title",
+      content: (movie) => (
+        <Link to={`/movies/${movie._id}`}>{movie.title}</Link>
+      ),
+    },
+    { path: "genre.name", label: "Genre" },
+    { path: "numberInStock", label: "Stock" },
+    { path: "dailyRentalRate", label: "Rate" },
+    {
+      key: "like",
+      content: (movie) => (
+        <Like liked={movie.liked} onClick={() => this.props.onLike(movie)} />
+      ),
+    },
+  ];
+
+  deleteColumn = {
+    key: "delete",
+    content: (movie) => (
+      <button
+        onClick={() => this.props.onDelete(movie)}
+        className="btn btn-danger btn-sm"
+      >
+        Delete
+      </button>
+    ),
+  };
+
+  constructor() {
+    super();
+    const user = auth.getCurrentUser();
+    if (user && user.isAdmin) this.columns.push(this.deleteColumn);
+  }
+
+  render() {
+    const { onSort, movies, sortColumn } = this.props;
+
+    return (
+      <Table
+        columns={this.columns}
+        data={movies}
+        sortColumn={sortColumn}
+        onSort={onSort}
+      />
+    );
+  }
+}
+
+export default MoviesTable;
+
+
+------------------------- *** ---------------------------

@@ -1,0 +1,73 @@
+2__
+post : http://localhost:3900/api/users
+
+{
+	"email" : "user1@gmail.com",
+	"password": "123456",
+	"name":"Kunal"
+}
+
+5__
+
+to create a new users, we use users api-end-point.
+3900/api/users
+
+we do have another endpoint "/auth" to managing our authentication session.
+so inorder to login a user we need to send post req to this auth endpoint.
+and in the body of the request we too have two property, email and password.
+
+if you send a valid email and password combination, the server will give us
+a jsonWebToken.
+so in the future when ever the client need to call the apiEndpoint, that need the
+user to be authenticated, the client will send this jsonWebToken back to the server,
+the server will then validate this, if its an valid id, then it will execute the
+client request.
+
+6__
+
+Here we are adding authService module, this module will be responsible for
+login and logout.
+
+9__
+
+there are some http header, which are mostly send by the server.
+whenever a header name that start with x, we treat it as a custom header,
+that is not part of the standard protocol.
+
+when we register a user, we can read this http header, extract the json web token,
+store it in the local storage and redirect the user.
+
+.header("access-control-expose-headers",x-auth-token)
+-> this header lets a webserver white-list.
+The headers that the browser or the client is allowing to access. and set it to "x-auth-token"
+
+11__
+install jwt decode.
+
+
+15__
+
+in node backend, as now i make "requireAuth" is true, so the user need
+to login, to create, update and delete a movie.
+
+so here we are making sure that only login user can update the data.
+
+16__
+
+here we are setting the jwt value, instaed of getting jwt value.
+
+17__
+
+make the first user as admin in mongodb.
+
+21__
+
+Here we are redirecting after login where exactly we left, and dealing with
+register form and login form.
+
+23__
+
+here we are allowing delete right to only admin user.
+
+
+------------------------- *** ---------------------------

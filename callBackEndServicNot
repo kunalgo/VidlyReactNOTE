@@ -1,0 +1,117 @@
+3>>
+added json view extension
+and used jsonplaceholder
+
+react -> what we have in the browser DOM, is in sync with the state of the application.
+
+4>>
+
+5>> here post is returning only newly created post  not the
+    entire list of post.
+
+6>> here we have http option request, the reason we have this request is,
+    because this application is hosted at local host and the backend is
+    hosted at somewhere else. these are two different domain.
+    so for security reason, when ever an application send an ajax request to a different domain,
+    then the browser always send an options request.
+
+10>>
+
+to check the exception we get is expected or unexpected,
+exception object has two property.
+
+Request and Response,
+response -> this property is set, if we successfully get any response from the server.
+            if n/w is down or server got crashed this property will be null;
+
+request  -> this property is set, if we successfully submit a request to the server.
+            else it will be null;
+
+
+15>>
+
+console.log is fine for development mode,
+but when we deploy our application in production env, its not helpfull.
+because then "console.log" is part of the end's user browser.
+
+and as a developer we dont have access to that "console.log".
+so we need to log that error, somewhere which we can access.
+
+so we used logging as a service provider(ie senty.io)
+
+-> (https://docs.sentry.io/clients/javascript/) ->  used the left link and get Configuring the Client's javascript value,
+and rest keep as same as MOSH. like same Raven
+
+
+------------
+16>>
+ just making the code looks good.
+
+20>>
+
+here we are learning how to add node backend to vidly our application
+
+open cmd and run mongod
+
+open another cmd and then do the below
+>  git clone https://github.com/mosh-hamedani/vidly-api-node.git
+-> now go to the vidly-api-node in vs code
+>> npm i
+in that second cmd run
+> node seed.js ////// to upload the data
+
+check this one too>> npm install --save bcryptjs and npm uninstall --save bcrypt
+
+make sure in users.js and auth.js
+you must import
+>>>  const bcrypt = require('bcryptjs');
+
+>> node index.js
+
+>>> http://localhost:3900/api/movies  {in browser and applications}
+>>> post in postman :{
+	"title":"My movie123",
+	"numberInStock":1,
+	"dailyRentalRate":2,
+	"genreId":"606594f1f24744dec8959eb9"   // its changes all the time so correct it as per that db
+}
+
+user will be displayed once you write
+
+
+{
+  > npm uninstall --save bcrypt
+  > npm install --save bcryptjs
+} // as of now this two atre not working
+
+21>>>
+in default.json
+ {
+  "jwtPrivateKey": "unsecureKey",
+  "db": "mongodb://localhost/vidly7",
+  "port": "3900",
+  "requiresAuth": false
+}
+
+
+23>>
+
+add httpService and logService.
+INSTALL AXIOS AND REACT toastify
+
+Add ToastContainer to app.js and
+
+24>>
+  in this case we need to change the movieForm.jsx.
+
+25>>
+  in this case we dont need to change the movieForm.jsx.
+  each time if disconnected...
+      then again mongod and index.js
+
+30>>
+  updating and saving movies
+
+31>>
+
+after completing this section, remove fakeGenreServices, and fakeMovieServices

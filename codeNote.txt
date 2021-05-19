@@ -1,0 +1,214 @@
+Components
+
+3.15_
+
+npm i bootstrap@4.1.1 font-awesome@4.7.0
+import bootstrap and font-awesome in index.js
+
+and using bootstrap header "starter"
+and also using fake-movie file and fake-genre files
+
+3.17__
+here we are building movies component and rendering all the element
+
+3.18__
+here we are deleting movies
+
+3.19__
+here we are applying condition
+
+4.20__
+here we added { liked:true } fakeMovieServices.js
+
+________________________________________
+__                                    __
+__PAGINATION AND FILTERING AND SORTING__
+________________________________________
+
+5.3___ Here we are determining Pagination component.
+       when ever you build a reusable components,before implementing that we should
+       think about the interface of the components.(ie what are the input that component is going to recieved and what
+       are the event its going to raised.)
+
+5.4___ To render a pagiantion we are going to use bootstrap.
+        [1 ... pagesCount].map() => _.range(1, pagesCount + 1);
+                       // +1 because. bydefault => [1,n)
+
+        also in this section we are installing and importing lodash. it has so many methods,
+        which is useful in pagination.
+
+5.5___ here we are applying active class to the current-page dynamically.
+
+whenever we clicking on a new page, onPageChange event(in pagination component) is raised.
+so we go back to our movies component. here we handle that event , we update the state(in handlepageChange).
+as we know, whenever the state of a component is changed, that component and all its children are rerendered.
+so the render method is called. now down at the bottom of this method we have pagination component.
+so the pagination component rerenderd with new props.
+so it will recieve new page.
+
+5.6__
+
+    Here we are paginating the data.
+we adding utils methods. and using paginate.js file.
+here we are creating a new folder "Utils" and using <paginate.js>
+// paginate page is giving us an lodash object. because we have used _ in the first.
+
+5.7__
+
+we have successfully done the pagination,
+now if consumer pass different pagination props.
+what if we  pass wrong value, or wrong props. ie( incase of 9 if we pass "abc" )
+so in such cases we have to do type checking.
+to do this install --- props-types
+ -> npm i prop-types@15.6.2
+
+so when we are building components, especially reusable components, its good pratice
+to use props-types to catch bugs related to type checking.
+
+5.9__
+ the reason we are initializing movies, genres to an empty array is because there is going
+ to take some time, until we get the data from the server, during this time we make sure
+ Movies and genres are not undefined, otherwise we are going to get a run time error.
+
+5.10__
+
+Here we are adding list group.
+
+if the genres column is little small, then change it from col-2 to col-3
+
+Here we are using bracket notation to access property dynamicly.
+rather then . property. By doing this we are no longer couple to genres, and we can
+reuse this list group with any kind of lists.
+
+5.11___
+The fewer props that we have to pass to a components, the easier it is to use that components.
+
+5.12__
+Here we are adding filter's its active class and all those.
+
+5.13___
+here we are filtering our movies
+
+5.14__
+Here we are adding all genre.
+
+5.15__
+Here we have high level and low level code. so we dont have consistemsy in our code.
+so we are creating a file in components in <moviesTable.jsx>
+
+5.16__
+So here we are handling click of the sort event.
+
+5.17__
+Here we are writing code for sorting each column
+
+5.18__
+doing the same
+
+5.19___
+if we have multiple table, then as per our till now implementation,
+we have to again duplicate the logic.
+
+so here we are extraing table header, then we can reuse that table header when-ever we have a table.
+whether we have a table of movies, customers and rentals.
+
+so here we create tableHeader.jsx
+
+5.20___
+in moviesTablw we have mixed level of abstractions.
+so we are hear adding tableBody
+
+5.21__
+
+Here we are rendering the content of each td.
+
+Here we are following different approach for table columns and like and delete button.
+
+so the like component we are referencing in the jsx expressions is essentially a plain,
+javaScript object. So, just like we can pass any objects to functions or use them as values of properties
+here in our column array, you can add a new property and set it to a jsx property.
+
+5.22__
+here we are adding key to each item.
+
+5.23__
+Here we are adding the sort icon in each table header.
+
+and adding pointer cursor
+
+5.24___
+till this implementation if we have to add table again, plus the table header.
+
+so its inconvinent to add new table. so here we are extracting table so that we
+can render it easily, when ever we are rendering a table of items.
+
+we are adding table.jsx here.
+
+5.25__
+Here we are extracting a methods.
+
+5.26__
+Here we are using props value directly because of destructring concept.
+
+************
+
+Routing__
+
+6.2__
+ -> take router-app.
+
+6.3__
+  In React we dont have concept like routing.Its only a libary not a framework.
+  Its only responsible for rendering the view nothing more.
+
+  To add routing to our application, we need to install a library called
+  react-router-dom.
+
+  BrowserRouter -> this component wrap the history object in the browser. And
+  passes it down to the component tree. So anywhere in our component tree, we
+  will be able to use the history object.
+
+  next we need to register our routes. that means what component we should be
+  render based on the given URL.
+
+6.4__
+
+  but we also used exact attribute.
+  we can also used switch, so in <Switch> if its matches one Routes then
+  it will ignore other routes.
+  with Switch and that is easier too.
+
+6.5__
+  In Single page applications, when the user navigate from one page to another,
+  instead of reloading the entire page with all it's assets, we should
+  only update what we have in the content area, so we dont have a full reload.
+
+  so add <link to=" "></Link>
+
+6.15__
+
+  IN app components, we are enclosing the App.. <BrowserRouter>
+
+  we create customers.jsx, movieForm.jsx, notFound.jsx, rentals.jsx.
+
+6.16__
+6.17__
+6.18__
+
+______________________________________________________________________________
+-<Forms>-
+
+7.2>>
+
+Here we are adding login form and making its UI.
+
+7.3>>
+
+Here we are handling
+
+7.5>> Here we will learn the proper way to work with Login Form and value
+
+7.6>> Here we are sending userName and password.
+
+7.7>>
+______________________________________________________________________________

@@ -1,0 +1,762 @@
+4>>
+import axios from "axios";
+
+async componentDidMount() {
+    const {data : posts} = await axios.get("https://jsonplaceholder.typicode.com/posts");
+    this.setState({posts})
+}
+
+5>>
+
+import axios from "axios";
+import React, { Component } from "react";
+import "./App.css";
+
+const apiEndpoint = "https://jsonplaceholder.typicode.com/posts";
+
+class App extends Component {
+  state = {
+    posts: []
+  };
+
+  async componentDidMount() {
+    const {data : posts} = await axios.get(apiEndpoint);
+    this.setState({posts})
+  }
+
+  handleAdd = async () => {
+    const obj = { title:'a' , body:'b'};
+    const {data : post} = await axios.post(apiEndpoint,obj);
+
+    const posts = [post, ...this.state.posts];
+    this.setState({posts})
+  };
+
+7>>
+
+handleUpdate = async post => {
+  post.title = "UPDATED";
+  await axios.put(apiEndpoint+"/"+ post.id, post);
+
+  const posts = [...this.state.posts];
+  const index = posts.indexOf(post);
+  post[index] = {...post};
+  this.setState({posts});
+};
+
+8>>
+
+handleDelete = async post => {
+  await axios.delete(apiEndpoint+"/"+ post.id);
+
+  const posts = this.state.posts.filter(p => p.id !== post.id);
+  this.setState({posts});
+};
+
+9>>
+
+handleDelete = async post => {
+    const originalPosts = this.state.posts;
+
+    const posts = this.state.posts.filter(p => p.id !== post.id);
+    this.setState({posts});
+
+    try{
+      await axios.delete(apiEndpoint+"/"+ post.id);
+      throw new Error("");
+    }catch(ex){
+      alert("Something failed while deleting a post!");
+      this.setState({posts:originalPosts})
+    }
+  };
+
+10>>
+
+handleDelete = async post => {
+    const originalPosts = this.state.posts;
+
+    const posts = this.state.posts.filter(p => p.id !== post.id);
+    this.setState({posts});
+
+    try{
+      await axios.delete(apiEndpoint + "/999"+ post.id);
+    } catch(ex) {
+      if(ex.response && ex.response.status === 404)
+        alert("This property has already been deleted.");
+      else{
+        console.log("Logging the error",ex);
+        alert("An unexpected error occurred.");
+      }
+      this.setState({posts : originalPosts});
+    }
+  };
+
+11>>
+
+import axios from "axios";
+import React, { Component } from "react";
+import "./App.css";
+
+axios.interceptors.response.use(null,error =>{
+  const expectedError = error.response && error.response.status >= 400 && error.response.status<500;
+
+  if(!expectedError){
+    console.log("Logging the error",error);
+    alert("An unexpected error occurred.");
+  }
+
+  return Promise.reject(error);
+});
+
+const apiEndpoint = "https://jsonplaceholder.typicode.com/posts";
+
+class App extends Component {
+  state = {
+    posts: []
+  };
+
+  async componentDidMount() {
+    const {data : posts} = await axios.get(apiEndpoint);
+    this.setState({posts})
+  }
+
+  handleAdd = async () => {
+    const obj = { title:'a' , body:'b'};
+    const {data : post} = await axios.post(apiEndpoint,obj);
+
+    const posts = [post, ...this.state.posts];
+    this.setState({posts})
+  };
+
+  handleUpdate = async post => {
+    post.title = "UPDATED";
+    await axios.put(apiEndpoint + "/" + post.id, post);
+
+    const posts = [...this.state.posts];
+    const index = posts.indexOf(post);
+    post[index] = {...post};
+    this.setState({posts});
+  };
+
+  handleDelete = async post => {
+    const originalPosts = this.state.posts;
+
+    const posts = this.state.posts.filter(p => p.id !== post.id);
+    this.setState({posts});
+
+    try{
+      await axios.delete(apiEndpoint + "/" + post.id);
+    } catch(ex) {
+      if(ex.response && ex.response.status === 404)
+        alert("This property has already been deleted.");
+      this.setState({posts : originalPosts});
+    }
+  };
+
+12>>
+
+app.js>>
+
+import React, { Component } from "react";
+import http from "./services/httpService";
+import "./App.css";
+
+const apiEndpoint = "https://jsonplaceholder.typicode.com/posts";
+
+class App extends Component {
+  state = {
+    posts: []
+  };
+
+  async componentDidMount() {
+    const {data : posts} = await http.get(apiEndpoint);
+    this.setState({posts})
+  }
+
+  handleAdd = async () => {
+    const obj = { title:'a' , body:'b'};
+    const {data : post} = await http.post(apiEndpoint,obj);
+
+    const posts = [post, ...this.state.posts];
+    this.setState({posts})
+  };
+
+  handleUpdate = async post => {
+    post.title = "UPDATED";
+    await http.put(apiEndpoint + "/" + post.id, post);
+
+    const posts = [...this.state.posts];
+    const index = posts.indexOf(post);
+    post[index] = {...post};
+    this.setState({posts});
+  };
+
+  handleDelete = async post => {
+    const originalPosts = this.state.posts;
+
+    const posts = this.state.posts.filter(p => p.id !== post.id);
+    this.setState({posts});
+
+    try{
+      await http.delete(apiEndpoint + "/" + post.id);
+    } catch(ex) {
+      if(ex.response && ex.response.status === 404)
+        alert("This property has already been deleted.");
+      this.setState({posts : originalPosts});
+    }
+  };
+
+  render() {
+    return (
+      <React.Fragment>
+        <button className="btn btn-primary" onClick={this.handleAdd}>
+          Add
+        </button>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Update</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.posts.map(post => (
+              <tr key={post.id}>
+                <td>{post.title}</td>
+                <td>
+                  <button
+                    className="btn btn-info btn-sm"
+                    onClick={() => this.handleUpdate(post)}
+                  >
+                    Update
+                  </button>
+                </td>
+                <td>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => this.handleDelete(post)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </React.Fragment>
+    );
+  }
+}
+
+export default App;
+
+httpService.js>>
+
+import axios from "axios";
+
+axios.interceptors.response.use(null,error =>{
+    const expectedError = error.response && error.response.status >= 400 && error.response.status<500;
+
+    if(!expectedError){
+      console.log("Logging the error",error);
+      alert("An unexpected error occurred.");
+    }
+
+    return Promise.reject(error);
+  });
+
+  export default{
+      get : axios.get,
+      post : axios.post,
+      put: axios.put,
+      delete : axios.delete
+};
+
+13>>
+
+config.json>>
+{
+    "apiEndpoint" : "https://jsonplaceholder.typicode.com/posts"
+}
+
+app.js>>
+
+import React, { Component } from "react";
+import http from "./services/httpService";
+import config from "./config.json";
+import "./App.css";
+
+class App extends Component {
+  state = {
+    posts: []
+  };
+
+  async componentDidMount() {
+    const {data : posts} = await http.get(config.apiEndpoint);
+    this.setState({posts})
+  }
+
+  handleAdd = async () => {
+    const obj = { title:'a' , body:'b'};
+    const {data : post} = await http.post(config.apiEndpoint,obj);
+
+    const posts = [post, ...this.state.posts];
+    this.setState({posts})
+  };
+
+  handleUpdate = async post => {
+    post.title = "UPDATED";
+    await http.put(config.apiEndpoint + "/" + post.id, post);
+
+    const posts = [...this.state.posts];
+    const index = posts.indexOf(post);
+    post[index] = {...post};
+    this.setState({posts});
+  };
+
+  handleDelete = async post => {
+    const originalPosts = this.state.posts;
+
+    const posts = this.state.posts.filter(p => p.id !== post.id);
+    this.setState({posts});
+
+    try{
+      await http.delete(config.apiEndpoint + "/" + post.id);
+    } catch(ex) {
+      if(ex.response && ex.response.status === 404)
+        alert("This property has already been deleted.");
+      this.setState({posts : originalPosts});
+    }
+  };
+
+  render() {
+    return (
+      <React.Fragment>
+        <button className="btn btn-primary" onClick={this.handleAdd}>
+          Add
+        </button>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Update</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.state.posts.map(post => (
+              <tr key={post.id}>
+                <td>{post.title}</td>
+                <td>
+                  <button
+                    className="btn btn-info btn-sm"
+                    onClick={() => this.handleUpdate(post)}
+                  >
+                    Update
+                  </button>
+                </td>
+                <td>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => this.handleDelete(post)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </React.Fragment>
+    );
+  }
+}
+
+export default App;
+
+
+14>>
+
+app.js>>
+
+import React, { Component } from "react";
+import http from "./services/httpService";
+import config from "./config.json";
+import "./App.css";
+
+import {ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+class App extends Component {
+  state = {
+    posts: []
+  };
+
+  async componentDidMount() {
+    const {data : posts} = await http.get(config.apiEndpoint);
+    this.setState({posts})
+  }
+
+  handleAdd = async () => {
+    const obj = { title:'a' , body:'b'};
+    const {data : post} = await http.post(config.apiEndpoint,obj);
+
+    const posts = [post, ...this.state.posts];
+    this.setState({posts})
+  };
+
+  handleUpdate = async post => {
+    post.title = "UPDATED";
+    await http.put(config.apiEndpoint + "/" + post.id, post);
+
+    const posts = [...this.state.posts];
+    const index = posts.indexOf(post);
+    post[index] = {...post};
+    this.setState({posts});
+  };
+
+  handleDelete = async post => {
+    const originalPosts = this.state.posts;
+
+    const posts = this.state.posts.filter(p => p.id !== post.id);
+    this.setState({posts});
+
+    try{
+      await http.delete("s"+config.apiEndpoint + "/999" + post.id);
+    } catch(ex) {
+      if(ex.response && ex.response.status === 404)
+        alert("This property has already been deleted.");
+      this.setState({posts : originalPosts});
+    }
+  };
+
+httpServices.js>>
+
+import axios from "axios";
+import {toast} from 'react-toastify';
+
+axios.interceptors.response.use(null,error =>{
+    const expectedError = error.response && error.response.status >= 400 && error.response.status<500;
+
+    if(!expectedError){
+      console.log("Logging the error",error);
+      toast.error("An unexpected error occurred.");
+      // // // toast("An unexpected error occurred.");
+    }
+
+    return Promise.reject(error);
+  });
+
+  export default{
+      get : axios.get,
+      post : axios.post,
+      put: axios.put,
+      delete : axios.delete
+  };
+
+15>>
+
+httpService>>
+
+import axios from "axios";
+import { toast } from "react-toastify";
+import Raven from "raven-js";
+
+axios.interceptors.response.use(null, (error) => {
+  const expectedError =
+    error.response &&
+    error.response.status >= 400 &&
+    error.response.status < 500;
+
+  if (!expectedError) {
+    Raven.captureException(error);
+    toast.error("An unexpected error occurred.");
+  }
+  return Promise.reject(error);
+});
+
+export default {
+  get: axios.get,
+  post: axios.post,
+  put: axios.put,
+  delete: axios.delete,
+};
+
+app.js>>
+
+import React from "react";
+import ReactDOM from "react-dom";
+import registerServiceWorker from "./registerServiceWorker";
+import "./index.css";
+import "bootstrap/dist/css/bootstrap.css";
+import Raven from "raven-js";
+
+import App from "./App";
+
+Raven.config(
+  "https://30318b915f79453f9ddf6b5ec94ba591@o561985.ingest.sentry.io/5700160"
+).install();
+
+ReactDOM.render(<App />, document.getElementById("root"));
+registerServiceWorker();
+
+
+app.js>>
+
+add "s" in handleDelete
+
+
+16>>
+
+httpService>>>
+
+import axios from "axios";
+import { toast } from "react-toastify";
+import logger from "./logService";
+
+axios.interceptors.response.use(null, (error) => {
+  const expectedError =
+    error.response &&
+    error.response.status >= 400 &&
+    error.response.status < 500;
+
+  if (!expectedError) {
+    logger.log(error);
+    toast.error("An unexpected error occurred.");
+  }
+  return Promise.reject(error);
+});
+
+export default {
+  get: axios.get,
+  post: axios.post,
+  put: axios.put,
+  delete: axios.delete,
+};
+
+
+logServices>>>
+
+import Raven from "raven-js";
+
+function init() {
+  Raven.config(
+    "https://30318b915f79453f9ddf6b5ec94ba591@o561985.ingest.sentry.io/5700160"
+  ).install();
+}
+
+function log(error) {
+  Raven.captureException(error);
+}
+
+export default {
+  init,
+  log,
+};
+
+index.js>>>
+
+import React from "react";
+import ReactDOM from "react-dom";
+import registerServiceWorker from "./registerServiceWorker";
+import "./index.css";
+import "bootstrap/dist/css/bootstrap.css";
+import logger from "./services/logService"
+import App from "./App";
+
+logger.init();
+
+ReactDOM.render(<App />, document.getElementById("root"));
+registerServiceWorker();
+
+24>>
+
+genreServices>>>--->
+
+import http from "./httpService";
+export function getGenres() {
+    return http.get('http://localhost:3900/api/genres');
+}
+
+movie.jsx>>>
+
+import { getGenres } from "../services/genreService";
+
+
+async componentDidMount() {
+  const { data } = await getGenres();
+  const genres = [{ _id: "", name: "All Genres" }, ...data];
+  this.setState({ movies: getMovies(), genres });
+}
+
+25>>>-->>
+
+app.js>>>
+
+import { getMovies, deleteMovie } from "../services/movieService";
+
+async componentDidMount() {
+  const { data } = await getGenres();
+  const genres = [{ _id: "", name: "All Genres" }, ...data];
+
+  const { data: movies } = await getMovies();
+  this.setState({ movies, genres });
+}
+
+handleDelete = async (movie) => {
+  const originalMovies = this.state.movies;
+  const movies = originalMovies.filter((m) => m._id !== movie._id);
+  this.setState({ movies });
+
+  try {
+    await deleteMovie(movie._id);
+  } catch (ex) {
+    if (ex.response && ex.response.status === 404)
+      toast.error("This movie has already been deleted");
+
+    this.setState({ movies: originalMovies });
+  }
+};
+____
+
+movieService.js__
+
+import http from "./httpService";
+
+const apiEndpoint = "http://localhost:3900/api/movies";
+
+export function getMovies(){
+    return http.get(apiEndpoint)
+}
+
+export function deleteMovie(movieId){
+    return http.delete(apiEndpoint+"/"+movieId)
+}
+
+26>>>
+
+import config from '../config.json'
+or
+import {apiUrl} from '../config.json'
+
+moviesServices>>>
+const apiEndpoint = apiUrl + "/movies";
+
+genreServices>>>
+export function getGenres() {
+    return http.get(apiUrl+'/genres');
+}
+
+28>>
+
+movieForm.jsx>>>
+
+import { getMovie, saveMovie } from "../services/movieService";
+import { getGenres } from "../services/genreService";
+
+async componentDidMount() {
+  const { data: genres } = await getGenres();
+  this.setState({ genres });
+
+  const movieId = this.props.match.params.id;
+  if (movieId === "new") return;
+
+  try {
+    const { data: movie } = await getMovie(movieId);
+    this.setState({ data: this.mapToViewModel(movie) });
+  } catch (ex) {
+    if (ex.response && ex.response.status === 404)
+      this.props.history.replace("/not-found");
+  }
+}
+
+movieService.js>>>
+
+export function getMovie(movieId){
+    return http.get(apiEndpoint+"/"+movieId);
+}
+
+export function saveMovie(movie){
+}
+
+29>>
+
+movieForm.jsx>>>
+async populateGenres() {
+  const { data: genres } = await getGenres();
+  this.setState({ genres });
+}
+async populateMovie() {
+  const movieId = this.props.match.params.id;
+  if (movieId === "new") return;
+
+  try {
+    const { data: movie } = await getMovie(movieId);
+    this.setState({ data: this.mapToViewModel(movie) });
+  } catch (ex) {
+    if (ex.response && ex.response.status === 404)
+      this.props.history.replace("/not-found");
+  }
+}
+
+async componentDidMount() {
+  await this.populateGenres();
+  await this.populateMovie();
+}
+
+30>>
+
+movieForm>>
+
+doSubmit = async () => {
+  await saveMovie(this.state.data);
+
+  this.props.history.push("/movies");
+};
+
+saveMovie>>>
+
+export function saveMovie(movie){
+    if(movie._id){
+        const body = {...movie};
+        delete body._id;
+        return http.put(apiEndpoint+"/"+movie._id,body)
+    }
+    return http.post(apiEndpoint,movie)
+}
+
+31>>
+
+movieService.jsx>>
+
+import http from "./httpService";
+import {apiUrl} from '../config.json';
+
+const apiEndpoint = apiUrl + "/movies";
+
+function movieUrl(id){
+    return `${apiEndpoint}/${id}`;
+}
+
+export function getMovies(){
+    return http.get(apiEndpoint)
+}
+
+export function getMovie(movieId){
+    return http.get(movieUrl(movieId));
+}
+
+export function saveMovie(movie){
+    if(movie._id){
+        const body = {...movie};
+        delete body._id;
+        return http.put(movieUrl(movie._id),body)
+    }
+    return http.post(apiEndpoint,movie)
+}
+
+export function deleteMovie(movieId){
+    return http.delete(movieUrl(movieId))
+}
+___________________________________
