@@ -1,0 +1,295 @@
+4>>
+
+Movie.jsx__
+
+import React, { Component } from "react";
+import withTooltip from "./withTooltip";
+
+class Movie extends Component {
+  render() {
+    return (
+      <div>
+        Movie
+        {this.props.showTooltip && <div> Some Tooltip </div>}
+      </div>
+    );
+  }
+}
+
+export default withTooltip(Movie);
+
+App.jsx__
+
+import logo from "./logo.svg";
+import "./App.css";
+import Movie from "./hoc/Movie";
+
+function App() {
+  return (
+    <div>
+      <Movie id={1} />
+    </div>
+  );
+}
+
+export default App;
+
+withTooltip.jsx__
+
+import React from "react";
+
+function withTooltip(Component) {
+  return class WithTooltip extends React.Component {
+    state = { showTooltip: false };
+
+    mouseOver = () => this.setState({ showTooltip: true });
+    mouseOut = () => this.setState({ showTooltip: false });
+
+    render() {
+      return (
+        <div onMouseOver={this.mouseOver} onMouseOut={this.mouseOut}>
+          <Component {...this.props} showTooltip={this.state.showTooltip} />
+        </div>
+      );
+    }
+  };
+}
+
+export default withTooltip;
+
+7>>
+
+import React, { Fragment, useState } from "react";
+
+function Counter(props) {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState("");
+
+  return (
+    <Fragment>
+      <input type="text" onChange={(e) => setName(e.target.value)} />
+      <div>
+        {name} has clicked {count} times!
+      </div>
+      <button onClick={() => setCount(count + 1)}>Increase</button>
+    </Fragment>
+  );
+}
+
+export default Counter;
+
+8>>
+
+import React, { Fragment, useEffect, useState } from "react";
+
+function Counter(props) {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    document.title = `${name} has clicked ${count} time!`;
+
+    return () => {
+      console.log("clean up");
+    };
+  }, [count]);
+
+  return (
+    <Fragment>
+      <input type="text" onChange={(e) => setName(e.target.value)} />
+      <div>
+        {name} has clicked {count} times!
+      </div>
+      <button onClick={() => setCount(count + 1)}>Increase</button>
+    </Fragment>
+  );
+}
+
+9>>
+
+useDocumentTitle.js__
+
+import { useEffect } from 'react';
+
+export default function useDocumentTitle(title){
+    useEffect(()=>{
+        document.title=title;
+
+        return () => {
+            console.log("clean Up")
+        };
+    });
+}
+
+counter.jsx___
+
+import React, { Fragment, useState } from "react";
+import useDocumentTitle from "./useDocumentTitle";
+
+function Counter(props) {
+  const [count, setCount] = useState(0);
+  const [name, setName] = useState("");
+
+  useDocumentTitle(`${name} has clicked ${count} times!`);
+
+  return (
+    <Fragment>
+      <input type="text" onChange={(e) => setName(e.target.value)} />
+      <div>
+        {name} has clicked {count} times!
+      </div>
+      <button onClick={() => setCount(count + 1)}>Increase</button>
+    </Fragment>
+  );
+}
+
+export default Counter;
+
+10>>
+
+users.jsx______
+
+import axios from "axios";
+import React from "react";
+
+import { useEffect } from "react";
+import { useState } from "react";
+
+function Users(props) {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    async function getUsers() {
+      const result = await axios("https://jsonplaceholder.typicode.com/users");
+      setUsers(result.data);
+    }
+    getUsers();
+  });
+  return (
+    <div>
+      <ul>
+        {users.map((user) => (
+          <li key={user.id}>{user.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default Users;
+
+12>>>
+
+MovieList__
+
+import React, { Component } from "react";
+import UserContext from "./userContext";
+
+class MovieList extends Component {
+  componentDidMount() {
+    console.log("context", this.context);
+  }
+  render() {
+    return (
+      <UserContext.Consumer>
+        {(UserContext) => <div>Movie List {UserContext.name} </div>}
+      </UserContext.Consumer>
+    );
+  }
+}
+
+MovieList.contextType = UserContext;
+
+export default MovieList;
+
+MoviePage__
+
+import React, { Component } from "react";
+import MovieList from "./MovieList";
+
+class MoviePage extends Component {
+  render() {
+    return (
+      <div>
+        <MovieList />
+      </div>
+    );
+  }
+}
+
+export default MoviePage;
+
+
+App__
+
+import React, { Component } from 'react';
+import MoviePage from './context/MoviePage';
+import UserContext from "./context/userContext"
+
+class App extends Component {
+  state = {currentUser : {name:"Kunal"}}
+  render() {
+    return (
+      <UserContext.Provider value={this.state.currentUser}>
+        <div>
+          <MoviePage />
+        </div>
+      </UserContext.Provider>
+    );
+  }
+}
+export default App;
+
+userContext__
+
+import React from 'react';
+
+const UserContext = React.createContext();
+UserContext.displayName = "UserContext";
+
+export default UserContext;
+
+13__
+
+<MovieRow.jsx>
+
+import React, { useContext } from "react";
+import UserContext from "./userContext";
+
+function MovieRow(props) {
+  const currentUser = useContext(UserContext);
+  console.log("context", currentUser);
+
+  return <div>{currentUser.name}</div>;
+}
+
+export default MovieRow;
+
+<MovieList>
+
+import React, { Component } from "react";
+import UserContext from "./userContext";
+import MovieRow from "./MovieRow";
+
+class MovieList extends Component {
+  componentDidMount() {
+    console.log("context", this.context);
+  }
+  render() {
+    return (
+      <UserContext.Consumer>
+        {(UserContext) => (
+          <div>
+            Movie List {UserContext.name} <MovieRow />
+          </div>
+        )}
+      </UserContext.Consumer>
+    );
+  }
+}
+
+MovieList.contextType = UserContext;
+
+export default MovieList;
+
+14__

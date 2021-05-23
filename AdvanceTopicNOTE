@@ -1,0 +1,79 @@
+shortcut__
+
+rcc
+rsf
+
+3>>
+
+react doesnot support the global installation of create react app package.
+so we need to uninstall it and bring it using a tool called npx.
+
+>> npm uninstall -g create-react-app
+>> npx create-react-app react-advance
+>> cd react-advance
+>> npm start
+
+
+4>>
+we use high order component to reuse logic across components
+
+in high order component, we create a new function. And pass this component as an argument to this function.
+in this function we r going to return a new component that wraps our original components.
+in that bigger component we are going to wrap all that common functionality.
+
+5>>
+
+BY CONVENTION, High order component name should be start with  "with____".
+here in Higher order component's we are passing the state
+and we are passing this state as a props to our movie component.
+
+to implement a higher order component, we create a new function that takes existing component.
+and return an new components.
+
+here we can return an class component or functional component. all we are doing here is
+we are implementing some logic and sharing that logic across different component.
+
+6>>
+
+till now we knew functional component are stateless and class component are stateful.
+so if we want to use state or life cycle methods then we should must use class components.
+
+
+from react 16.8 we have some new concept "hooks", which allow us to build functional component
+with all the feature we have in class component.
+so we can use state and life cycle methods of class component.
+
+functional component makes our code shorter then functional component.
+
+8>>
+
+useEffect -> this function get call every time the function get rendered.
+    optionally we can use array of dependency with it, so in this array we
+    list all the state variable that are effect hook dependent upon.
+
+    eg : if we add count to the array, this function will called when the count
+    variable get changes.
+
+    here we are using return function as componentDidMount.
+
+
+10__
+
+the function we passed to the effect hook has to be regular function.
+
+11>>
+
+
+
+12>>
+
+Here we are going to learn how to use context-API in class component.
+
+the provider component is nothing special.
+It has a special value called, "value".
+
+
+
+
+
+--
